@@ -34,17 +34,17 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
 
 static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
-	unsigned int program = glCreateProgram();
+	unsigned int program =  glCreateProgram();
 	unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexShader);
-	unsigned int fs = CompileShader(GL_VERTEX_SHADER, fragmentShader);
+	unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentShader);
 
 	glAttachShader(program, vs);
 	glAttachShader(program, fs);
 	glLinkProgram(program);
 	glValidateProgram(program);
 
-	//glDetachShader(program, vs);
-	//glDetachShader(program, fs);
+	glDetachShader(program, vs);
+	glDetachShader(program, fs);
 	glDeleteShader(vs);
 	glDeleteShader(fs);
 
@@ -114,8 +114,10 @@ int main(void)
 		"{\n"
 		"	color = vec4(1.0, 0.0, 0.0, 1.0);\n"
 		"}\n";
+	
 	//create and bind shader
 	unsigned int shader = CreateShader(vertexShader, fragmentShader);
+	
 	glUseProgram(shader);	
 
 	/* Loop until the user closes the window */
