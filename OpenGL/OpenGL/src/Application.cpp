@@ -56,7 +56,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source)
 	if (result == GL_FALSE) {
 		int length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*) alloca(length * sizeof(char));
+		char* message = (char*) _alloca(length * sizeof(char));
 		glGetShaderInfoLog(id, length, &length, message);
 
 		std::cout << "failed to compile " <<
@@ -122,21 +122,32 @@ int main(void)
 		-0.5f,-0.5f,
 		 0.5f, -0.5f,
 		 0.5f,0.5f,
-
-		 0.5f,0.5f,
 		-0.5f, 0.5f,
-		-0.5f,-0.5f,
-
 	};
+
+	unsigned int indices[] = {
+		0,1,2,
+		2,3,0
+	};
+
+	unsigned int indexSize = 6;
+	unsigned int triangleAmount = 2;
 
 	//vertex buffer
 	unsigned int buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 2 * sizeof(float),position, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, indexSize * triangleAmount * sizeof(float),position, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+
+	//using indice buffer
+	unsigned int ibo;
+	glGenBuffers(1, &ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexSize * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
 
 	//shader setup
 	ShaderProgramSource source = ParseShader("res/shaders/Basic.shader");
@@ -156,7 +167,8 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		//draw call for buffer
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		
 		/* Swap front and back buffers */
